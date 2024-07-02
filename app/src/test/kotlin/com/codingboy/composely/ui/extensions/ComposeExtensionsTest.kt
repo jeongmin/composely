@@ -13,7 +13,7 @@ class ComposeExtensionsTest {
         val originalModifier = Modifier
         val newModifier = Modifier.padding(10.dp)
 
-        val result = originalModifier.applyIf(true) { newModifier }
+        val result = originalModifier.applyIf(true, { newModifier })
         Assert.assertNotEquals(result, originalModifier)
     }
 
@@ -22,8 +22,28 @@ class ComposeExtensionsTest {
         val originalModifier = Modifier
         val newModifier = Modifier.padding(10.dp)
 
-        val result = originalModifier.applyIf(false) { newModifier }
+        val result = originalModifier.applyIf(false, { newModifier })
 
         Assert.assertEquals(originalModifier, result)
+    }
+
+    @Test
+    fun applyIfAppliesWhenFalseModifierWhenConditionIsFalse() {
+        val originalModifier = Modifier
+        val newModifier = Modifier.padding(10.dp)
+
+        val result = originalModifier.applyIf(false, { originalModifier }, { newModifier })
+
+        Assert.assertEquals(newModifier, result)
+    }
+
+    @Test
+    fun applyIfDoesNotApplyWhenFalseModifierWhenConditionIsTrue() {
+        val originalModifier = Modifier
+        val newModifier = Modifier.padding(10.dp)
+
+        val result = originalModifier.applyIf(true, { newModifier }, { originalModifier })
+
+        Assert.assertEquals(newModifier, result)
     }
 }
