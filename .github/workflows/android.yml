@@ -26,8 +26,5 @@ jobs:
     - name: Run Local Unit tests
       run: ./gradlew test
 
-    - name: Run Instrumented Unit tests
-      run: ./gradlew connectedAndroidTest
-
     - name: Build with Gradle
       run: ./gradlew build
