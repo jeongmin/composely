@@ -1,5 +1,7 @@
 package com.codingboy.composely.ui.extensions
 
+import android.graphics.Bitmap
+import android.graphics.Picture
 import androidx.compose.ui.Modifier
 
 
@@ -26,3 +28,15 @@ inline fun Modifier.applyIf(
     whenTrue: Modifier.() -> Modifier,
     whenFalse: Modifier.() -> Modifier = { this }
 ): Modifier = if (conditional) then(whenTrue(Modifier)) else then(whenFalse(Modifier))
+
+fun Picture.toBitmap(): Bitmap {
+    val bitmap = Bitmap.createBitmap(
+        this.width,
+        this.height,
+        Bitmap.Config.ARGB_8888
+    )
+
+    val canvas = android.graphics.Canvas(bitmap)
+    canvas.drawPicture(this)
+    return bitmap
+}
