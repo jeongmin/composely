@@ -1,8 +1,14 @@
 package com.codingboy.composely.ui.extensions
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Picture
 import androidx.compose.ui.Modifier
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.util.Date
 
 
 /**
@@ -35,16 +41,43 @@ inline fun Modifier.applyIf(
  * This function creates a Bitmap with the same dimensions as the Picture. It then draws the Picture onto a Canvas,
  * which is backed by the Bitmap. The resulting Bitmap is returned.
  *
+ * @param quality The quality of the Bitmap. Default is 100.
+ *
  * @return A Bitmap representation of the Picture.
  */
-fun Picture.toBitmap(): Bitmap {
+fun Picture.toBitmap(quality: Int = 100): Bitmap {
     val bitmap = Bitmap.createBitmap(
         this.width,
         this.height,
         Bitmap.Config.ARGB_8888
-    )
+    ).run {
+        if (quality < 100) {
+            val outputStream = ByteArrayOutputStream()
+            compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            BitmapFactory.decodeByteArray(outputStream.toByteArray(), 0, outputStream.toByteArray().size)
+        } else {
+            this
+        }
+    }
 
     val canvas = android.graphics.Canvas(bitmap)
     canvas.drawPicture(this)
     return bitmap
+}
+
+fun Bitmap.saveAsFile(filePath: String, fileName: String = Date().time.toString()): File {
+    val folder = File(filePath)
+    if (!folder.exists()) folder.mkdirs()
+
+    val file = File(filePath, "${fileName}.jpg")
+    var outputStream: OutputStream? = null
+    try {
+        if (file.createNewFile()) {
+            outputStream = FileOutputStream(file)
+            this.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
+    } finally {
+        outputStream?.close()
+    }
+    return file
 }
