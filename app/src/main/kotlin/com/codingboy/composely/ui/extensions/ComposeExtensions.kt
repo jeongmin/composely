@@ -65,19 +65,12 @@ fun Picture.toBitmap(quality: Int = 100): Bitmap {
     return bitmap
 }
 
-fun Bitmap.saveAsFile(filePath: String, fileName: String = Date().time.toString()): File {
-    val folder = File(filePath)
-    if (!folder.exists()) folder.mkdirs()
-
-    val file = File(filePath, "${fileName}.jpg")
-    var outputStream: OutputStream? = null
-    try {
-        if (file.createNewFile()) {
-            outputStream = FileOutputStream(file)
-            this.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+fun Bitmap.saveAsFile(filePath: String, fileName: String = Date().time.toString()): File? {
+    return kotlin.runCatching {
+        File(filePath, "${fileName}.jpg").apply {
+            FileOutputStream(this).use {
+                compress(Bitmap.CompressFormat.JPEG, 100, it)
+            }
         }
-    } finally {
-        outputStream?.close()
-    }
-    return file
+    }.getOrNull()
 }
